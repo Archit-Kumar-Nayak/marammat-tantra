@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MARAMMAT TANTRA - Smart Service Center Management System</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            yantra: { main: '#6366f1', cyan: '#06b6d4', dark: '#0b0f19', card: '#111827' }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background-color 0.3s, color 0.3s; }
+    
+    /* Dark Theme Glassmorphism & High-Contrast Cards */
+    .dark body { background-color: #070a12; color: #f3f4f6; }
+    .dark .glass-card { background: rgba(17, 24, 39, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); }
+    .dark .glass-modal { background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.15); }
+    .dark .inner-card { background-color: #111827; border: 1px solid #374151; }
+    .dark .input-bg { background-color: #0f172a; border-color: #334155; color: #f8fafc; }
+    .dark .header-bg { background-color: rgba(15, 23, 42, 0.95); border-color: #1e293b; }
+    
+    /* Mode Selector Card Visibility in Dark Mode */
+    .dark .model-card { background-color: #111827; border: 1.5px solid #374151; }
+    .dark .model-card:hover { border-color: #6366f1; background-color: #1f2937; }
+    
+    /* Light Theme Styling */
+    html:not(.dark) body { background-color: #f1f5f9; color: #0f172a; }
+    html:not(.dark) .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border: 1px solid rgba(0, 0, 0, 0.08); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); }
+    html:not(.dark) .glass-modal { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(16px); border: 1px solid rgba(0, 0, 0, 0.12); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+    html:not(.dark) .inner-card { background-color: #ffffff; border: 1px solid #e2e8f0; }
+    html:not(.dark) .input-bg { background-color: #ffffff; border-color: #cbd5e1; color: #0f172a; }
+    html:not(.dark) .header-bg { background-color: rgba(255, 255, 255, 0.95); border-color: #e2e8f0; }
+    html:not(.dark) .model-card { background-color: #ffffff; border: 1.5px solid #cbd5e1; }
+    html:not(.dark) .model-card:hover { border-color: #6366f1; background-color: #f8fafc; }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.3); border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.5); }
+    
+    .brand-gradient { background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); }
+    .text-gradient { background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between custom-scrollbar overflow-x-hidden">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header class="header-bg backdrop-blur-md border-b px-6 py-3 flex items-center justify-between text-xs sticky top-0 z-50 shadow-sm transition-colors duration-300">
+    <div class="flex items-center gap-4">
+      <!-- LOGO -->
+      <div class="flex items-center gap-3 cursor-pointer group" onclick="resetToSetup()">
+        <div class="relative w-10 h-10 rounded-xl brand-gradient flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 p-0.5 overflow-hidden">
+          <svg viewBox="0 0 100 100" class="w-full h-full text-white fill-none stroke-current stroke-[2.5]" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="44" class="opacity-60 stroke-dasharray-[6,3]" />
+            <path d="M 6 50 Q 20 40, 30 50 T 54 50 T 78 50 T 94 50" class="opacity-80 stroke-[1.5]" />
+            <polygon points="50,12 85,78 15,78" class="opacity-90 stroke-[2]" />
+            <polygon points="50,88 85,22 15,22" class="opacity-90 stroke-[2]" />
+            <circle cx="50" cy="50" r="16" class="fill-current opacity-20" />
+            <circle cx="50" cy="50" r="8" class="fill-current" />
+            <circle cx="50" cy="12" r="3" class="fill-current" />
+            <circle cx="85" cy="78" r="3" class="fill-current" />
+            <circle cx="15" cy="78" r="3" class="fill-current" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-extrabold tracking-wider text-gradient leading-none">MARAMMAT TANTRA</span>
+        </div>
+      </div>
+      
+      <span class="text-slate-300 dark:text-slate-700 hidden sm:inline">|</span>
+      
+      <!-- C BACKEND INDICATOR -->
+      <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-mono font-medium text-[11px]">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+        <i class="fa-solid fa-microchip text-xs"></i> Pure C Kernel Active (Stacks & Queues)
+      </div>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- C CODE INSPECTOR BUTTON -->
+      <button onclick="toggleCModal()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-mono font-semibold text-xs transition shadow-md flex items-center gap-1.5">
+        <i class="fa-solid fa-code"></i> C Backend Source
+      </button>
+
+      <!-- LIGHT / DARK MODE TOGGLE BUTTON -->
+      <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700 transition border border-slate-300 dark:border-slate-700 flex items-center justify-center" title="Toggle Light / Dark Mode">
+        <i id="themeIcon" class="fa-solid fa-sun text-amber-500 text-sm"></i>
+      </button>
+
+      <div class="font-mono text-slate-500 dark:text-slate-400 text-[11px] bg-slate-100 dark:bg-slate-900 px-3 py-1 rounded-lg border border-slate-300 dark:border-slate-800" id="liveClock">--:--:-- IST</div>
+    </div>
+  </header>
+
+  <!-- STEP WIZARD CONTAINER -->
+  <main id="wizardContainer" class="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 relative">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div id="bgGlow" class="absolute -top-40 -left-40 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl transition-all duration-700"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-cyan-600/15 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="w-full max-w-3xl glass-card rounded-2xl p-6 sm:p-8 relative z-10 shadow-2xl transition-colors duration-300">
+      
+      <!-- Wizard Progress Header -->
+      <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-3">
+          <div id="stepIcon" class="w-10 h-10 rounded-xl brand-gradient text-white flex items-center justify-center font-extrabold text-lg shadow-lg">
+            1
+          </div>
+          <div>
+            <h1 id="stepTitle" class="text-xl font-bold text-slate-900 dark:text-white">Select Service Center Type</h1>
+            <p id="stepSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Step 1: Choose your operational model</p>
+          </div>
+        </div>
+
+        <button id="btnNavBack" onclick="navigateBackStack()" class="hidden items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 transition border border-slate-300 dark:border-slate-700">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+      </div>
+
+      <!-- STEP 1: CENTER TYPE SELECTOR -->
+      <div id="step1" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div onclick="selectCenterType('coco')" class="group p-5 rounded-xl model-card cursor-pointer transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 flex items-center justify-center text-xl border border-indigo-500/20 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-building-flag"></i>
+              </div>
+              <span class="text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">COCO Mode</span>
+            </div>
+            <h3 class="font-bold text-slate-900 dark:text-slate-100 text-base mb-1">Company-Owned, Company-Operated</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300">High-end flagship centers. Pure brand control, official warranty, global CRM history.</p>
+          </div>
+
+          <div onclick="selectCenterType('asp')" class="group p-5 rounded-xl model-card cursor-pointer transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-sky-500/10 text-sky-500 dark:text-sky-400 flex items-center justify-center text-xl border border-sky-500/20 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-certificate"></i>
+              </div>
+              <span class="text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-sky-800">ASP Franchise</span>
+            </div>
+            <h3 class="font-bold text-slate-900 dark:text-slate-100 text-base mb-1">Authorized Service Providers</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300">Franchise network. Multi-location warranty fulfillment, brand authorization guidelines.</p>
+          </div>
+
+          <div onclick="selectCenterType('multibrand')" class="group p-5 rounded-xl model-card cursor-pointer transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 flex items-center justify-center text-xl border border-emerald-500/20 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+              </div>
+              <span class="text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">Multi-Brand</span>
+            </div>
+            <h3 class="font-bold text-slate-900 dark:text-slate-100 text-base mb-1">Third-Party / Multi-Brand Hub</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300">Out-of-warranty specialists. Fast turnaround, cost comparisons, multi-manufacturer repair queues.</p>
+          </div>
+
+          <div onclick="selectCenterType('local')" class="group p-5 rounded-xl model-card cursor-pointer transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex items-start justify-between mb-3">
+              <div class="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-500 dark:text-orange-400 flex items-center justify-center text-xl border border-orange-500/20 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-store"></i>
+              </div>
+              <span class="text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-300 border border-orange-300 dark:border-orange-800">Local Repair</span>
+            </div>
+            <h3 class="font-bold text-slate-900 dark:text-slate-100 text-base mb-1">Unorganized Local Repair Hub</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300">Rapid component-level fixes. High daily ticket volume, cash transactions, minimal friction.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: CONDITIONAL COMPANY NAME & PRODUCT SELECTION -->
+      <div id="step2" class="hidden space-y-6">
+        <div id="companyInputWrapper" class="space-y-2">
+          <label class="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 tracking-wider">
+            Brand / Company Name <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-copyright absolute left-3.5 top-3.5 text-slate-400"></i>
+            <input type="text" id="companyNameInput" placeholder="Type company name (e.g., Samsung, Apple, Maruti, Tata, LG, Xiaomi)" class="w-full pl-10 pr-4 py-2.5 rounded-lg input-bg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Mandatory for COCO / ASP centers. Dashboard locks to this specific brand.</p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 tracking-wider">
+            Select Product / Item Category to Service <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-boxes-stacked absolute left-3.5 top-3.5 text-slate-400"></i>
+            <select id="productCategorySelect" class="w-full pl-10 pr-4 py-2.5 rounded-lg input-bg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm appearance-none cursor-pointer">
+              <option value="" disabled selected>-- Choose Specific Product / Domain --</option>
+              <optgroup label="1. Personal Electronics & Gadgets">
+                <option value="Smartphones & Tablets">Smartphones & Tablets</option>
+                <option value="Laptops & Desktops">Laptops & Desktops</option>
+                <option value="Smartwatches & Audio Gear">Smartwatches & Audio Gear</option>
+              </optgroup>
+              <optgroup label="2. Home Appliances">
+                <option value="Air Conditioners (ACs)">Air Conditioners (ACs)</option>
+                <option value="Water Purifiers (RO systems)">Water Purifiers (RO systems)</option>
+                <option value="Washing Machines">Washing Machines</option>
+                <option value="Refrigerators">Refrigerators</option>
+                <option value="Kitchen Appliances">Kitchen Appliances</option>
+              </optgroup>
+              <optgroup label="3. Automobiles (Vehicles)">
+                <option value="Two-Wheelers (Scooters & Motorcycles)">Two-Wheelers (Scooters & Motorcycles)</option>
+                <option value="Three-Wheelers">Three-Wheelers</option>
+                <option value="Four-Wheelers (Cars)">Four-Wheelers (Cars)</option>
+              </optgroup>
+              <optgroup label="4. Home Utility & Lifestyle Items">
+                <option value="Inverters & Home Batteries">Inverters & Home Batteries</option>
+                <option value="Geysers (Water Heaters)">Geysers (Water Heaters)</option>
+                <option value="Other Electronics">Other Electronics (Specify in ticket)</option>
+              </optgroup>
+            </select>
+            <i class="fa-solid fa-chevron-down absolute right-3.5 top-3.5 text-slate-400 pointer-events-none"></i>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">The entire dashboard dataset will isolate strictly to this chosen product type.</p>
+        </div>
+
+        <button onclick="submitStep2()" class="w-full py-3 rounded-lg brand-gradient hover:opacity-90 font-semibold text-white text-sm transition shadow-lg flex items-center justify-center gap-2">
+          Continue to Service Center Details <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- STEP 3: SERVICE CENTER DETAILS -->
+      <div id="step3" class="hidden space-y-5">
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 tracking-wider">
+            Service Centre Name <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-store absolute left-3.5 top-3.5 text-slate-400"></i>
+            <input type="text" id="centerNameInput" placeholder="e.g. MARAMMAT TANTRA Hub - Bandra West Branch" class="w-full pl-10 pr-4 py-2.5 rounded-lg input-bg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold uppercase text-slate-700 dark:text-slate-300 tracking-wider">
+            Service Centre Physical Address <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <i class="fa-solid fa-location-dot absolute left-3.5 top-3.5 text-slate-400"></i>
+            <textarea id="centerAddressInput" rows="3" placeholder="e.g. Shop 14, Commercial Hub, SV Road, Bandra West, Mumbai 400050" class="w-full pl-10 pr-4 py-2.5 rounded-lg input-bg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+          </div>
+        </div>
+
+        <button onclick="submitStep3AndLaunch()" class="w-full py-3.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-bold text-base text-white transition shadow-xl flex items-center justify-center gap-2">
+          <i class="fa-solid fa-rocket"></i> Open Specialized MARAMMAT TANTRA Dashboard
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- STEP 4: MARAMMAT TANTRA MANAGEMENT DASHBOARD -->
+  <div id="mainDashboard" class="hidden flex-1 p-4 sm:p-6 space-y-6 max-w-7xl mx-auto w-full">
+    
+    <header id="dashHeader" class="glass-card rounded-2xl p-5 border transition-all duration-300">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="dashTypeBadge" class="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border border-indigo-500/30">
+              COCO Center
+            </span>
+            <span id="dashCompanyBadge" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
+              Brand: Apple
+            </span>
+            <span id="dashCategoryBadge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">
+              Smartphones & Tablets
+            </span>
+          </div>
+          <h1 id="dashCenterName" class="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">MARAMMAT TANTRA Service Hub</h1>
+          <p id="dashCenterAddress" class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-location-dot text-rose-500"></i> SV Road, Bandra West, Mumbai
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <button onclick="openNewTicketModal()" class="px-3.5 py-2 rounded-xl brand-gradient hover:opacity-90 text-white font-semibold text-xs transition shadow-md flex items-center gap-1.5">
+            <i class="fa-solid fa-plus"></i> New Complaint
+          </button>
+          <button onclick="openCRMHistoryModal()" class="px-3.5 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs transition border border-slate-300 dark:border-slate-700 flex items-center gap-1.5">
+            <i class="fa-solid fa-users-viewfinder text-cyan-500"></i> Worldwide CRM
+          </button>
+          <button onclick="resetToSetup()" class="p-2 rounded-xl bg-slate-200 dark:bg-slate-800/80 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition border border-slate-300 dark:border-slate-700" title="Switch Center Type or Product Domain">
+            <i class="fa-solid fa-rotate text-indigo-500"></i> Switch Domain
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- METRICS OVERVIEW -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="glass-card rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-medium uppercase text-slate-500 dark:text-slate-400">Queue Size (C FIFO)</p>
+          <h3 id="statQueueCount" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0</h3>
+        </div>
+        <div class="w-10 h-10 rounded-lg bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-medium uppercase text-slate-500 dark:text-slate-400">Tech Workload</p>
+          <h3 id="statTechLoad" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0 / 18</h3>
+        </div>
+        <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-users-gear"></i>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-medium uppercase text-slate-500 dark:text-slate-400">Action Stack Top</p>
+          <h3 id="statStackCount" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0 Actions</h3>
+        </div>
+        <div class="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-500 dark:text-amber-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-xl p-4 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div>
+          <p class="text-[11px] font-medium uppercase text-slate-500 dark:text-slate-400">Spare Parts Pipeline</p>
+          <h3 id="statSparePartsCount" class="text-2xl font-bold text-slate-900 dark:text-white mt-1">0 Req</h3>
+        </div>
+        <div class="w-10 h-10 rounded-lg bg-cyan-500/10 text-cyan-500 dark:text-cyan-400 flex items-center justify-center text-lg">
+          <i class="fa-solid fa-boxes-packing"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN LAYOUT -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- LEFT 2 COLS: REPAIR REQUEST QUEUE (C FIFO QUEUE) & SPARE PARTS PIPELINE -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <!-- REPAIR QUEUE -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-indigo-500"></i>
+              <h2 class="text-base font-bold text-slate-900 dark:text-white" id="queueTitleDomain">Product Queue</h2>
+            </div>
+            <span class="text-xs text-slate-500 dark:text-slate-400 font-mono" id="queueHeaderMeta">Head: Node #0</span>
+          </div>
+
+          <div id="queueListContainer" class="space-y-3 max-h-[460px] overflow-y-auto custom-scrollbar pr-1">
+            <!-- Dynamic Queue Items -->
+          </div>
+        </div>
+
+        <!-- SPARE PARTS REQUEST QUEUE & SUPPLY CHAIN PIPELINE -->
+        <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-toolbox text-cyan-500"></i>
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">Spare Parts Request Queue & Supply Chain Pipeline</h2>
+            </div>
+            <span class="text-xs text-cyan-600 dark:text-cyan-400 font-mono" id="sparePartsQueueMeta">Queue: 0 pending</span>
+          </div>
+
+          <div id="sparePartsListContainer" class="space-y-2.5 max-h-60 overflow-y-auto custom-scrollbar pr-1 text-xs">
+            <!-- Dynamic Spare Parts Requests -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT 1 COL: TECHNICIAN LOAD BALANCER & STACK HISTORY -->
+      <div class="space-y-6">
+        
+        <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-user-shield text-emerald-500"></i>
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">Technicians & Profiles</h2>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Click for repairs</span>
+          </div>
+
+          <div id="techniciansList" class="space-y-3">
+            <!-- Dynamic Technicians -->
+          </div>
+        </div>
+
+        <div class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-clock-rotate-left text-amber-500"></i>
+              <h2 class="text-base font-bold text-slate-900 dark:text-white">Action Stack & Undo</h2>
+            </div>
+            <button onclick="performUndo()" id="btnUndoAction" class="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1 transition">
+              <i class="fa-solid fa-rotate-left"></i> Undo Top Action
+            </button>
+          </div>
+
+          <div id="stackActionList" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1 text-xs font-mono">
+            <!-- Dynamic Stack -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: POSTFIX (RPN) DYNAMIC PRICING INVOICE POPUP -->
+  <div id="modalInvoice" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="glass-modal rounded-2xl p-6 max-w-lg w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-file-invoice-dollar text-emerald-500"></i> Repair Invoice & RPN Pricing Engine
+        </h3>
+        <button onclick="closeInvoiceModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div class="p-3 rounded-xl inner-card space-y-1">
+          <p><span class="font-bold text-slate-700 dark:text-slate-300">Ticket Ref:</span> <span id="invTicketRef" class="font-mono text-indigo-500">#T-000</span></p>
+          <p><span class="font-bold text-slate-700 dark:text-slate-300">Customer:</span> <span id="invCustName">--</span></p>
+          <p><span class="font-bold text-slate-700 dark:text-slate-300">Device Model:</span> <span id="invDeviceModel">--</span></p>
+        </div>
+
+        <div class="space-y-2">
+          <div class="flex justify-between py-1 border-b border-slate-200 dark:border-slate-800">
+            <span class="text-slate-500">Spare Parts Cost:</span>
+            <span id="invPartsCost" class="font-mono font-bold text-slate-900 dark:text-white">₹0</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-200 dark:border-slate-800">
+            <span class="text-slate-500">Technician Labor Tier:</span>
+            <span id="invLaborCost" class="font-mono font-bold text-slate-900 dark:text-white">₹0</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-200 dark:border-slate-800">
+            <span class="text-slate-500">GST / Tax (18%):</span>
+            <span id="invTaxCost" class="font-mono font-bold text-slate-900 dark:text-white">₹0</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-200 dark:border-slate-800">
+            <span class="text-slate-500">Promotional Discount:</span>
+            <span id="invDiscount" class="font-mono font-bold text-emerald-500">-₹0</span>
+          </div>
+          <div class="flex justify-between py-2 text-sm font-bold border-t-2 border-indigo-500/40">
+            <span>Final Calculated Total:</span>
+            <span id="invTotal" class="font-mono text-indigo-600 dark:text-indigo-400 text-base">₹0</span>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900 text-emerald-400 font-mono text-[10px] space-y-1">
+          <p class="font-bold text-slate-300">Postfix Expression (RPN) Evaluation Trace:</p>
+          <p id="invRPNExpression" class="break-all"></p>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2">
+        <button onclick="closeInvoiceModal()" class="px-4 py-2 rounded-lg brand-gradient hover:opacity-90 text-white text-xs font-bold">Approve & Print Invoice</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTER NEW CUSTOMER TICKET -->
+  <div id="modalNewTicket" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="glass-modal rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fa-solid fa-ticket text-indigo-500"></i> Register New Complaint
+        </h3>
+        <button onclick="closeNewTicketModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block mb-1 text-slate-700 dark:text-slate-300 font-medium">Customer Name</label>
+          <input type="text" id="inputCustName" placeholder="e.g. Rajesh Verma" class="w-full px-3 py-2 rounded input-bg focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block mb-1 text-slate-700 dark:text-slate-300 font-medium">Contact Phone Number</label>
+          <input type="text" id="inputCustPhone" placeholder="e.g. +91 98201 44321" class="w-full px-3 py-2 rounded input-bg focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block mb-1 text-slate-700 dark:text-slate-300 font-medium">Item Model / Serial</label>
+          <input type="text" id="inputDeviceModel" placeholder="Specific model details" class="w-full px-3 py-2 rounded input-bg focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        </div>
+        <div>
+          <label class="block mb-1 text-slate-700 dark:text-slate-300 font-medium">Reported Fault / Complaint</label>
+          <textarea id="inputComplaint" rows="2" placeholder="Describe issue in detail" class="w-full px-3 py-2 rounded input-bg focus:outline-none focus:ring-1 focus:ring-indigo-500"></textarea>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end gap-2">
+        <button onclick="closeNewTicketModal()" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">Cancel</button>
+        <button onclick="submitNewTicket()" class="px-4 py-2 rounded-lg brand-gradient hover:opacity-90 text-white text-xs font-bold">Enqueue Ticket (C Queue)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: WORLDWIDE CRM SEARCH & CUSTOMER PROFILE LOOKUP -->
+  <div id="modalCRMHistory" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="glass-modal rounded-2xl p-6 max-w-3xl w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fa-solid fa-earth-asia text-cyan-500"></i> Worldwide Customer CRM Database
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Search customer profiles and domain-isolated complaint logs</p>
+        </div>
+        <button onclick="closeCRMHistoryModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400"></i>
+        <input type="text" id="crmSearchInput" onkeyup="filterCRMData()" placeholder="Search by customer name, phone, ticket #, or issue..." class="w-full pl-10 pr-4 py-2.5 rounded-xl input-bg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs">
+      </div>
+
+      <div id="crmDataList" class="space-y-3 max-h-96 overflow-y-auto custom-scrollbar pr-1">
+        <!-- Dynamic CRM Data -->
+      </div>
+
+      <div class="pt-2 flex justify-between items-center text-xs text-slate-500">
+        <span id="crmCountBadge">Showing records</span>
+        <button onclick="closeCRMHistoryModal()" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Close CRM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CUSTOMER PROFILE & PREVIOUS COMPLAINTS DETAIL -->
+  <div id="modalCustProfile" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="glass-modal rounded-2xl p-6 max-w-xl w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-3">
+          <div id="custAvatar" class="w-10 h-10 rounded-full brand-gradient text-white flex items-center justify-center font-bold text-lg">C</div>
+          <div>
+            <h3 id="custProfileName" class="text-base font-bold text-slate-900 dark:text-white">Customer Profile</h3>
+            <p id="custProfilePhone" class="text-xs text-slate-500 dark:text-slate-400 font-mono">+91 ----- -----</p>
+          </div>
+        </div>
+        <button onclick="closeCustProfileModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Previous Complaint History</h4>
+        <div id="custProfileComplaintsList" class="space-y-2.5 max-h-72 overflow-y-auto custom-scrollbar pr-1"></div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeCustProfileModal()" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">Close Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TECHNICIAN PROFILE & REPAIR HISTORY -->
+  <div id="modalTechProfile" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="glass-modal rounded-2xl p-6 max-w-xl w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-3">
+          <div id="techAvatar" class="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-lg">T</div>
+          <div>
+            <h3 id="techProfileName" class="text-base font-bold text-slate-900 dark:text-white">Technician Name</h3>
+            <p id="techProfileMeta" class="text-xs text-amber-500 font-semibold"><i class="fa-solid fa-star"></i> 4.8 Rating</p>
+          </div>
+        </div>
+        <button onclick="closeTechProfileModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="p-3 rounded-xl inner-card text-xs space-y-1">
+        <span class="font-bold text-slate-700 dark:text-slate-300">Verified Customer Review:</span>
+        <p id="techProfileReview" class="italic text-slate-600 dark:text-slate-400">"Punctual & expert in diagnostic troubleshooting."</p>
+      </div>
+
+      <div class="space-y-3">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Previous Repairs Executed in Domain</h4>
+        <div id="techProfileRepairsList" class="space-y-2.5 max-h-64 overflow-y-auto custom-scrollbar pr-1"></div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeTechProfileModal()" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs">Close Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RAW C KERNEL SOURCE CODE INSPECTOR -->
+  <div id="modalCSource" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+    <div class="glass-modal rounded-2xl p-6 max-w-4xl w-full shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white font-mono flex items-center gap-2">
+            <i class="fa-solid fa-code text-emerald-500"></i> Pure C Backend Kernel Source Code (Stacks & Queues)
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Complete C Structs for Stacks (Undo, Diagnostic Trees, RPN Pricing, Navigation) and Queues (FIFO Repair, Spare Parts, Callbacks, Load Balancing, Audit Telemetry)</p>
+        </div>
+        <button onclick="toggleCModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <pre class="bg-slate-900 p-4 rounded-xl text-emerald-400 font-mono text-[11px] max-h-[480px] overflow-y-auto custom-scrollbar border border-slate-800 select-all"><code id="cCodeView"></code></pre>
+
+      <div class="flex justify-between items-center text-xs text-slate-500">
+        <span>MARAMMAT TANTRA C Memory & Data Structures Engine</span>
+        <button onclick="toggleCModal()" class="px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Close Code Inspector</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-100 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800/80 py-3 px-6 text-center text-slate-500 text-xs transition-colors duration-300">
+    MARAMMAT TANTRA &copy; 2026 | Smart Service Center Management System
+  </footer>
+
+  <!-- RAW C KERNEL SOURCE CODE SCRIPT TAG -->
+  <script type="text/c" id="cBackendSource">
+/*
+ ============================================================================
+  MARAMMAT TANTRA SMART SERVICE CENTER MANAGEMENT SYSTEM
+  Pure C Backend Kernel & Advanced Data Structures:
+  
+  1. STACK APPLICATIONS (LIFO Structure):
+     - Multi-Level Undo & Redo Mechanism (ActionStack)
+     - Temporary Job State Stack (Mid-job rollback snapshot)
+     - Hierarchical Part Dependency & Diagnostic Tree (DFS Traversal)
+     - Navigation History & Breadcrumb State Stack
+     - Diagnostic Troubleshooting Decision Trees
+     - Postfix Expression Evaluation for Dynamic Pricing (RPN Engine)
+     - Unsaved Ticket Draft Recovery Stack
+
+  2. QUEUE APPLICATIONS (FIFO & Priority Structure):
+     - Spare Parts Request Queue & Supply Chain Pipeline (Priority Queue)
+     - Customer Callback Queue for Follow-up Milestones
+     - Automated Technician Load Balancing Dispatch Queue
+     - Customer Queue & Walk-In Management
+     - Real-Time Customer Notification Dispatcher (Asynchronous Event Queue)
+     - Buffered Audit Logging & Telemetry Memory Queue
+ ============================================================================
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_STACK_SIZE 100
+#define MAX_QUEUE_SIZE 256
+
+typedef enum { WAITING, RECEIVED, DIAGNOSED, REPAIRED, DELIVERED } TicketStatus;
+
+// --- STACK STRUCTURES ---
+typedef struct {
+    int ticketId;
+    char actionType[30];
+    TicketStatus prevStatus;
+    int prevTechId;
+    char description[100];
+} ActionStackNode;
+
+typedef struct {
+    ActionStackNode items[MAX_STACK_SIZE];
+    int top;
+} ActionStack;
+
+typedef struct {
+    char nodeId[20];
+    char diagnosticResult[100];
+    struct DiagnosticNode* prevNode;
+} DiagnosticStackNode;
+
+typedef struct {
+    DiagnosticStackNode stack[MAX_STACK_SIZE];
+    int top;
+} DiagnosticTreeStack;
+
+// --- QUEUE STRUCTURES ---
+typedef struct TicketNode {
+    int ticketId;
+    char customerName[50];
+    char phone[20];
+    char deviceModel[50];
+    char complaint[100];
+    TicketStatus status;
+    int assignedTechId;
+    int priorityLevel; // 1 = Urgent SLA, 2 = Standard, 3 = Low
+    struct TicketNode* next;
+} TicketNode;
+
+typedef struct {
+    TicketNode* head;
+    TicketNode* tail;
+    int size;
+} RepairQueue;
+
+typedef struct {
+    int partRequestId;
+    int ticketId;
+    char partName[40];
+    int urgencyPriority;
+    int partsReceived; // 0 = Pending, 1 = Received
+} SparePartQueueItem;
+
+typedef struct {
+    SparePartQueueItem items[MAX_QUEUE_SIZE];
+    int front, rear, count;
+} SparePartsQueue;
+
+// Initialize C FIFO Repair Queue
+RepairQueue* initRepairQueue() {
+    RepairQueue* q = (RepairQueue*)malloc(sizeof(RepairQueue));
+    q->head = NULL;
+    q->tail = NULL;
+    q->size = 0;
+    return q;
+}
+
+// Enqueue Ticket with Priority Ranking
+void enqueueRepairTicket(RepairQueue* q, int id, const char* name, const char* phone, const char* model, const char* fault, int techId, int priority) {
+    TicketNode* newNode = (TicketNode*)malloc(sizeof(TicketNode));
+    newNode->ticketId = id;
+    strcpy(newNode->customerName, name);
+    strcpy(newNode->phone, phone);
+    strcpy(newNode->deviceModel, model);
+    strcpy(newNode->complaint, fault);
+    newNode->status = WAITING;
+    newNode->assignedTechId = techId;
+    newNode->priorityLevel = priority;
+    newNode->next = NULL;
+
+    if (q->tail == NULL) {
+        q->head = q->tail = newNode;
+    } else {
+        q->tail->next = newNode;
+        q->tail = newNode;
+    }
+    q->size++;
+}
+
+// Push to LIFO Action Stack for Undo
+void pushAction(ActionStack* stack, int ticketId, const char* type, TicketStatus prevStatus, int prevTech, const char* desc) {
+    if (stack->top < MAX_STACK_SIZE - 1) {
+        stack->top++;
+        stack->items[stack->top].ticketId = ticketId;
+        strcpy(stack->items[stack->top].actionType, type);
+        stack->items[stack->top].prevStatus = prevStatus;
+        stack->items[stack->top].prevTechId = prevTech;
+        strcpy(stack->items[stack->top].description, desc);
+    }
+}
+  </script>
+
+  <!-- JS BRIDGE & COMPREHENSIVE MULTI-DOMAIN DUMMY DATASETS -->
+  <script>
+    document.getElementById('cCodeView').textContent = document.getElementById('cBackendSource').textContent;
+
+    /* ========================================================================
+       COMPREHENSIVE DOMAIN-ISOLATED DUMMY DATASETS (3 TECHS & 3 CUSTOMERS PER PRODUCT)
+       ======================================================================== */
+
+    const TECHNICIANS_BY_DOMAIN = {
+      'Smartphones & Tablets': [
+        { id: 101, name: 'Suresh Kumar', rating: 4.8, review: 'Micro-soldering & display calibration expert.', activeJobs: 0, repairs: [{ ticket: '#T-8821', device: 'iPhone 15 Pro', issue: '[Repaired] OLED Display & Digitizer Replacement', date: '17 Oct 2026' }, { ticket: '#T-7643', device: 'Galaxy S24 Ultra', issue: '[Repaired] Motherboard Power IC Repair', date: '17 Oct 2026' }] },
+        { id: 102, name: 'Priya Patel', rating: 4.5, review: 'Specialist in battery replacement & liquid damage recovery.', activeJobs: 0, repairs: [{ ticket: '#T-9102', device: 'iPad Air 5th Gen', issue: '[Repaired] Battery & Charging Port Replacement', date: '17 Oct 2026' }] },
+        { id: 103, name: 'Sneha Reddy', rating: 4.7, review: 'Precision camera sensor & lens replacement technician.', activeJobs: 0, repairs: [{ ticket: '#T-5502', device: 'Pixel 8 Pro', issue: '[Repaired] Periscope Camera Sensor Calibration', date: '17 Oct 2026' }] }
+      ],
+      'Laptops & Desktops': [
+        { id: 111, name: 'Rahul Verma', rating: 4.9, review: 'Advanced BGA reballing and thermal management guru.', activeJobs: 0, repairs: [{ ticket: '#T-301', device: 'MacBook Pro M3', issue: '[Repaired] Logic Board Power Rail Short', date: '17 Oct 2026' }, { ticket: '#T-204', device: 'Dell XPS 15', issue: '[Repaired] Heatsink & Thermal Paste Overhaul', date: '17 Oct 2026' }] },
+        { id: 112, name: 'Karan Joshi', rating: 4.4, review: 'Expert in SSD data recovery and RAM bus diagnostics.', activeJobs: 0, repairs: [{ ticket: '#T-102', device: 'Lenovo Legion 5', issue: '[Repaired] NVMe Controller Chip Replacement', date: '17 Oct 2026' }] },
+        { id: 113, name: 'Vikram Mehta', rating: 4.6, review: 'Custom PC liquid loop & GPU VRAM soldering specialist.', activeJobs: 0, repairs: [{ ticket: '#T-405', device: 'Asus ROG Strix G16', issue: '[Repaired] VRAM Chip Reballing & BIOS Flash', date: '17 Oct 2026' }] }
+      ],
+      'Smartwatches & Audio Gear': [
+        { id: 121, name: 'Ananya Iyer', rating: 4.7, review: 'Miniature acoustic driver and waterproof gasket specialist.', activeJobs: 0, repairs: [{ ticket: '#T-881', device: 'Sony WH-1000XM5', issue: '[Repaired] ANC Microphone Diaphragm Fix', date: '17 Oct 2026' }, { ticket: '#T-412', device: 'Apple Watch Ultra 2', issue: '[Repaired] OLED Glass & Seal Replacement', date: '17 Oct 2026' }] },
+        { id: 122, name: 'Rohan Sen', rating: 4.5, review: 'Bluetooth chipset & battery micro-soldering expert.', activeJobs: 0, repairs: [{ ticket: '#T-302', device: 'Galaxy Watch 6', issue: '[Repaired] PPG Sensor Glass Swap', date: '17 Oct 2026' }] },
+        { id: 123, name: 'Divya Nair', rating: 4.8, review: 'Audiophile planar magnetic driver restoration specialist.', activeJobs: 0, repairs: [{ ticket: '#T-119', device: 'Sennheiser Momentum 4', issue: '[Repaired] Lithium Cell Swap & Headband Re-wire', date: '17 Oct 2026' }] }
+      ],
+      'Air Conditioners (ACs)': [
+        { id: 201, name: 'Amit Kumar', rating: 4.6, review: 'Inverter Compressor & PCB Board Circuit Expert.', activeJobs: 0, repairs: [{ ticket: '#T-4011', device: 'Daikin 1.5 Ton Inverter AC', issue: '[Repaired] PCB Inverter Capacitor Replacement', date: '17 Oct 2026' }, { ticket: '#T-309', device: 'Voltas 2 Ton Split AC', issue: '[Repaired] Copper Coil Brazing & Gas Refill', date: '17 Oct 2026' }] },
+        { id: 202, name: 'Harish Chander', rating: 4.5, review: 'HVAC ducting & twin-rotary compressor specialist.', activeJobs: 0, repairs: [{ ticket: '#T-211', device: 'Hitachi Cassette AC 3 Ton', issue: '[Repaired] Expansion Valve & R32 Gas Flushing', date: '17 Oct 2026' }] },
+        { id: 203, name: 'Ganesh Rao', rating: 4.7, review: 'BLDC fan motor & smart Wi-Fi PCB controller expert.', activeJobs: 0, repairs: [{ ticket: '#T-105', device: 'LG Dual Inverter 1.5T', issue: '[Repaired] PCB Microcontroller Replacement', date: '17 Oct 2026' }] }
+      ],
+      'Water Purifiers (RO systems)': [
+        { id: 211, name: 'Manoj Tiwari', rating: 4.5, review: 'TDS calibration and ultraviolet sterilization expert.', activeJobs: 0, repairs: [{ ticket: '#T-112', device: 'Kent Grand RO+UV', issue: '[Repaired] Booster Pump & Membrane Flush', date: '17 Oct 2026' }, { ticket: '#T-089', device: 'Aquaguard Delight', issue: '[Repaired] SMPS Power Adapter Replacement', date: '17 Oct 2026' }] },
+        { id: 212, name: 'Praveen Das', rating: 4.6, review: 'Alkaline mineralizer & copper cartridge specialist.', activeJobs: 0, repairs: [{ ticket: '#T-304', device: 'Pureit Copper+ RO', issue: '[Repaired] Solenoid Valve & Post-Carbon Filter', date: '17 Oct 2026' }] },
+        { id: 213, name: 'Santosh Yadav', rating: 4.3, review: 'Commercial RO plant & high-pressure booster pump technician.', activeJobs: 0, repairs: [{ ticket: '#T-210', device: 'Livpure Zinger', issue: '[Repaired] UV Lamp & Pressure Switch Replacement', date: '17 Oct 2026' }] }
+      ],
+      'Washing Machines': [
+        { id: 221, name: 'Sanjay Gupta', rating: 4.7, review: 'Direct drive motor and drum spider arm specialist.', activeJobs: 0, repairs: [{ ticket: '#T-502', device: 'LG 8kg Front Load', issue: '[Repaired] Spider Arm & Bearing Assembly Fix', date: '17 Oct 2026' }] },
+        { id: 222, name: 'Ramesh Babu', rating: 4.4, review: 'Inverter belt drive & drain pump valve expert.', activeJobs: 0, repairs: [{ ticket: '#T-312', device: 'Samsung 7.5kg Top Load', issue: '[Repaired] Inlet Solenoid & Drain Pump Swap', date: '17 Oct 2026' }] },
+        { id: 223, name: 'Alok Pandey', rating: 4.6, review: 'Smart Diagnosis module & shock absorber specialist.', activeJobs: 0, repairs: [{ ticket: '#T-201', device: 'Bosch Series 6', issue: '[Repaired] Suspension Struts & Door Gasket Fix', date: '17 Oct 2026' }] }
+      ],
+      'Refrigerators': [
+        { id: 231, name: 'Deepak Sharma', rating: 4.8, review: 'Hermetic compressor welding and defrost timer diagnostics.', activeJobs: 0, repairs: [{ ticket: '#T-701', device: 'Samsung Double Door', issue: '[Repaired] Defrost Heater & Bi-metal Fuse Swap', date: '17 Oct 2026' }] },
+        { id: 232, name: 'Gopal Krishnan', rating: 4.5, review: 'Frost-free duct cooling & inverter compressor relay expert.', activeJobs: 0, repairs: [{ ticket: '#T-410', device: 'LG Side-by-Side 688L', issue: '[Repaired] Linear Inverter PCB Overhaul', date: '17 Oct 2026' }] },
+        { id: 233, name: 'Subhash Saxena', rating: 4.6, review: 'Evaporator coil leak detection & R600a gas charging pro.', activeJobs: 0, repairs: [{ ticket: '#T-303', device: 'Whirlpool Protton 3-Door', issue: '[Repaired] Thermostat & Evaporator Fan Replacement', date: '17 Oct 2026' }] }
+      ],
+      'Kitchen Appliances': [
+        { id: 241, name: 'Ravi Pillai', rating: 4.3, review: 'Induction coil winding and microwave magnetron testing.', activeJobs: 0, repairs: [{ ticket: '#T-219', device: 'Morphy Richards Microwave', issue: '[Repaired] High Voltage Diode & Magnetron Repair', date: '17 Oct 2026' }] },
+        { id: 242, name: 'Mohan Lal', rating: 4.6, review: 'Heavy duty mixer grinder armature & chimney motor specialist.', activeJobs: 0, repairs: [{ ticket: '#T-108', device: 'Faber Auto-Clean Chimney', issue: '[Repaired] Blower Motor & Touch Sensor PCB', date: '17 Oct 2026' }] },
+        { id: 243, name: 'Ashok Samant', rating: 4.5, review: 'Air fryer heating element & OTG thermostat repair expert.', activeJobs: 0, repairs: [{ ticket: '#T-311', device: 'Philips Digital Air Fryer', issue: '[Repaired] Thermal Fuse & Control Panel Repair', date: '17 Oct 2026' }] }
+      ],
+      'Two-Wheelers (Scooters & Motorcycles)': [
+        { id: 301, name: 'Nikhil Shinde', rating: 4.8, review: 'EV battery management system (BMS) controller expert.', activeJobs: 0, repairs: [{ ticket: '#T-991', device: 'Ather 450X', issue: '[Repaired] Motor Controller Firmware Flashing', date: '17 Oct 2026' }, { ticket: '#T-812', device: 'Honda Activa 6G', issue: '[Repaired] Carburetor Overhaul & Ignition Coil', date: '17 Oct 2026' }] },
+        { id: 302, name: 'Balaji Gowda', rating: 4.6, review: 'High performance motorcycle clutch & ABS sensor technician.', activeJobs: 0, repairs: [{ ticket: '#T-405', device: 'TVS Apache RTR 200', issue: '[Repaired] Dual-Channel ABS Sensor Calibration', date: '17 Oct 2026' }] },
+        { id: 303, name: 'Farhan Akhtar', rating: 4.7, review: 'BLDC hub motor & lithium battery cell balancing specialist.', activeJobs: 0, repairs: [{ ticket: '#T-312', device: 'Ola S1 Pro', issue: '[Repaired] MCU Converter & Harness Wire Replacement', date: '17 Oct 2026' }] }
+      ],
+      'Three-Wheelers': [
+        { id: 311, name: 'Vinod Kulkarni', rating: 4.5, review: 'Differential gearbox and CNG/Electric kit tuning expert.', activeJobs: 0, repairs: [{ ticket: '#T-441', device: 'Bajaj RE Auto', issue: '[Repaired] Differential Gearbox Rebuild', date: '17 Oct 2026' }] },
+        { id: 312, name: 'Gurmeet Singh', rating: 4.4, review: 'E-Rickshaw 1000W BLDC motor & axle bearing specialist.', activeJobs: 0, repairs: [{ ticket: '#T-209', device: 'Mahindra Treo EV', issue: '[Repaired] Telematics ECU & Throttle Potentiometer', date: '17 Oct 2026' }] },
+        { id: 313, name: 'Dharmendra Sahu', rating: 4.6, review: 'Hydraulic drum brake & propeller shaft overhaul master.', activeJobs: 0, repairs: [{ ticket: '#T-104', device: 'Piaggio Ape City', issue: '[Repaired] CNG Pressure Regulator & Injector Clean', date: '17 Oct 2026' }] }
+      ],
+      'Four-Wheelers (Cars)': [
+        { id: 321, name: 'Vikram Singh', rating: 4.9, review: 'Certified EV Powertrain & ECU Diagnostic Specialist.', activeJobs: 0, repairs: [{ ticket: '#T-9012', device: 'Tata Nexon EV Max', issue: '[Repaired] High Voltage Battery Thermal Management Repair', date: '17 Oct 2026' }, { ticket: '#T-8112', device: 'Mahindra XUV700', issue: '[Repaired] ADAS Radar Sensor Recalibration & Brake Pads', date: '17 Oct 2026' }] },
+        { id: 322, name: 'Siddharth Roy', rating: 4.7, review: 'Automatic dual-clutch transmission & steering rack pro.', activeJobs: 0, repairs: [{ ticket: '#T-502', device: 'Hyundai Creta Turbo', issue: '[Repaired] DCT Actuator Solenoid Calibration', date: '17 Oct 2026' }] },
+        { id: 323, name: 'Jaspreet Dhillon', rating: 4.8, review: 'Common rail diesel injector (CRDI) & turbocharger master.', activeJobs: 0, repairs: [{ ticket: '#T-311', device: 'Maruti Suzuki Brezza', issue: '[Repaired] EGR Valve Cleaning & Turbo Intercooler Pipe', date: '17 Oct 2026' }] }
+      ],
+      'Inverters & Home Batteries': [
+        { id: 401, name: 'Rakesh Jha', rating: 4.6, review: 'Sine wave inverter transformer and tubular battery testing.', activeJobs: 0, repairs: [{ ticket: '#T-551', device: 'Luminous Solar Inverter 1000VA', issue: '[Repaired] MOSFET Bridge Replacement', date: '17 Oct 2026' }] },
+        { id: 402, name: 'Brijesh Mishra', rating: 4.5, review: 'MPPT solar charge controller & lithium iron phosphate pro.', activeJobs: 0, repairs: [{ ticket: '#T-302', device: 'Microtek Digital 1550', issue: '[Repaired] Control Board Relay & Charging IC Swap', date: '17 Oct 2026' }] },
+        { id: 403, name: 'Anil Deshmukh', rating: 4.7, review: 'High KVA online UPS & static bypass switch technician.', activeJobs: 0, repairs: [{ ticket: '#T-201', device: 'Exide 1050VA Inverter', issue: '[Repaired] Output Voltage Regulator & Acid Top-up', date: '17 Oct 2026' }] }
+      ],
+      'Geysers (Water Heaters)': [
+        { id: 411, name: 'Sunil Rathod', rating: 4.4, review: 'Thermostat calibration and magnesium anode rod replacement.', activeJobs: 0, repairs: [{ ticket: '#T-109', device: 'Havells Instanio 15L', issue: '[Repaired] Heating Element & Thermostat Swap', date: '17 Oct 2026' }] },
+        { id: 412, name: 'Mahesh Shetty', rating: 4.6, review: 'Glassline tank descaling & thermal cutoff switch expert.', activeJobs: 0, repairs: [{ ticket: '#T-204', device: 'AO Smith 25L Storage Geyser', issue: '[Repaired] Safety Valve & Anode Rod Replacement', date: '17 Oct 2026' }] },
+        { id: 413, name: 'Dinesh Solanki', rating: 4.3, review: 'Gas water heater solenoid & ignition module technician.', activeJobs: 0, repairs: [{ ticket: '#T-102', device: 'Crompton Solarium Qube', issue: '[Repaired] Capillary Thermostat & Wiring Harness', date: '17 Oct 2026' }] }
+      ],
+      'Other Electronics': [
+        { id: 421, name: 'Ajay Nair', rating: 4.5, review: 'Custom PCB prototyping and RF transmitter repair.', activeJobs: 0, repairs: [{ ticket: '#T-021', device: 'DJI Drone Controller', issue: '[Repaired] Joystick Potentiometer Replacement', date: '17 Oct 2026' }] },
+        { id: 422, name: 'Nitin Gadkari', rating: 4.7, review: 'Embedded system microcontrollers & Raspberry Pi repair pro.', activeJobs: 0, repairs: [{ ticket: '#T-108', device: 'Bose SoundLink Revolve', issue: '[Repaired] Charging Port IC & Li-ion Cell Swap', date: '17 Oct 2026' }] },
+        { id: 423, name: 'Saurabh Ganguly', rating: 4.6, review: 'SMPS industrial power supply & LED driver repair master.', activeJobs: 0, repairs: [{ ticket: '#T-205', device: 'Epson L3250 Printer', issue: '[Repaired] Printhead De-clogging & Logic Board Fix', date: '17 Oct 2026' }] }
+      ]
+    };
+
+    const CUSTOMER_PROFILES_BY_DOMAIN = {
+      'Smartphones & Tablets': [
+        { name: 'Rajesh Verma', phone: '+91 98201 44321', city: 'Mumbai', complaints: [{ ticket: '#T-8821', domain: 'Smartphones & Tablets', issue: 'Display issue - Screen touch freeze', city: 'Mumbai COCO', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Sunita Menon', phone: '+91 98112 44556', city: 'Delhi', complaints: [{ ticket: '#T-7643', domain: 'Smartphones & Tablets', issue: 'Severe battery drain post OS update', city: 'Delhi Flagship', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Rohan Deshmukh', phone: '+91 97443 88990', city: 'Bengaluru', complaints: [{ ticket: '#T-9102', domain: 'Smartphones & Tablets', issue: 'Overheating during charging', city: 'Bengaluru Hub', status: 'In-Progress', date: '17 Oct 2026' }] }
+      ],
+      'Laptops & Desktops': [
+        { name: 'Aditya Roy', phone: '+91 98111 22334', city: 'Bengaluru', complaints: [{ ticket: '#T-301', domain: 'Laptops & Desktops', issue: 'Kernel panic & sudden shutdown under load', city: 'Bengaluru ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Shruti Haasan', phone: '+91 98222 33445', city: 'Chennai', complaints: [{ ticket: '#T-204', domain: 'Laptops & Desktops', issue: 'Fan grinding noise & thermal throttling', city: 'Chennai Hub', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Varun Dhawan', phone: '+91 98333 44556', city: 'Mumbai', complaints: [{ ticket: '#T-102', domain: 'Laptops & Desktops', issue: 'NVMe drive not detected in BIOS', city: 'Mumbai COCO', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Smartwatches & Audio Gear': [
+        { name: 'Meera Nambiar', phone: '+91 97222 33445', city: 'Chennai', complaints: [{ ticket: '#T-881', domain: 'Smartwatches & Audio Gear', issue: 'ANC feedback whistle in left driver', city: 'Chennai Hub', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Kishan Patel', phone: '+91 97333 44556', city: 'Ahmedabad', complaints: [{ ticket: '#T-302', domain: 'Smartwatches & Audio Gear', issue: 'Heart rate optical sensor not glowing', city: 'Ahmedabad ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Neha Kakkar', phone: '+91 97444 55667', city: 'Delhi', complaints: [{ ticket: '#T-119', domain: 'Smartwatches & Audio Gear', issue: 'Left earbud battery holds charge for 10 mins', city: 'Delhi Hub', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Air Conditioners (ACs)': [
+        { name: 'Sanjay Dutt', phone: '+91 98333 44556', city: 'Mumbai', complaints: [{ ticket: '#T-4011', domain: 'Air Conditioners (ACs)', issue: 'Indoor blower motor humming without spinning', city: 'Mumbai ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Kapil Sharma', phone: '+91 98444 55667', city: 'Amritsar', complaints: [{ ticket: '#T-211', domain: 'Air Conditioners (ACs)', issue: 'Cassette AC filter light warning & no cooling', city: 'Amritsar Hub', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Juhi Chawla', phone: '+91 98555 66778', city: 'Kolkata', complaints: [{ ticket: '#T-105', domain: 'Air Conditioners (ACs)', issue: 'Outdoor unit tripping circuit breaker on startup', city: 'Kolkata ASP', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Water Purifiers (RO systems)': [
+        { name: 'Pooja Hegde', phone: '+91 98444 55667', city: 'Hyderabad', complaints: [{ ticket: '#T-112', domain: 'Water Purifiers (RO systems)', issue: 'Low permeate flow rate and foul taste', city: 'Hyderabad Hub', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Vijay Devarakonda', phone: '+91 98555 66778', city: 'Hyderabad', complaints: [{ ticket: '#T-304', domain: 'Water Purifiers (RO systems)', issue: 'Auto-shutoff valve not working leading to overflow', city: 'Hyderabad COCO', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Rani Mukerji', phone: '+91 98666 77889', city: 'Mumbai', complaints: [{ ticket: '#T-210', domain: 'Water Purifiers (RO systems)', issue: 'SMPS adapter emitting burning smell', city: 'Mumbai ASP', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Washing Machines': [
+        { name: 'Karan Johar', phone: '+91 98555 66778', city: 'Mumbai', complaints: [{ ticket: '#T-502', domain: 'Washing Machines', issue: 'Spin cycle vibration noise', city: 'Mumbai COCO', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Shilpa Shetty', phone: '+91 98666 77889', city: 'Mumbai', complaints: [{ ticket: '#T-312', domain: 'Washing Machines', issue: 'Water not draining out during rinse cycle', city: 'Mumbai ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Manoj Bajpayee', phone: '+91 98777 88990', city: 'Patna', complaints: [{ ticket: '#T-201', domain: 'Washing Machines', issue: 'Door lock error code E01 on digital display', city: 'Patna Hub', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Refrigerators': [
+        { name: 'Deepika Padukone', phone: '+91 98666 77889', city: 'Bengaluru', complaints: [{ ticket: '#T-701', domain: 'Refrigerators', issue: 'Ice maker frost buildup blockage', city: 'Bengaluru Flagship', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Ranveer Singh', phone: '+91 98777 88990', city: 'Mumbai', complaints: [{ ticket: '#T-410', domain: 'Refrigerators', issue: 'Inverter compressor clicking sound every 5 minutes', city: 'Mumbai COCO', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Anushka Sharma', phone: '+91 98888 99000', city: 'Pune', complaints: [{ ticket: '#T-303', domain: 'Refrigerators', issue: 'Lower vegetable fresh section not cooling', city: 'Pune ASP', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Kitchen Appliances': [
+        { name: 'Chef Sanjeev', phone: '+91 98777 88990', city: 'Delhi', complaints: [{ ticket: '#T-219', domain: 'Kitchen Appliances', issue: 'Microwave turntable motor not rotating', city: 'Delhi ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Vikas Khanna', phone: '+91 98888 99000', city: 'Amritsar', complaints: [{ ticket: '#T-108', domain: 'Kitchen Appliances', issue: 'Auto-clean chimney suction touch control failure', city: 'Amritsar Hub', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Farah Khan', phone: '+91 98999 00111', city: 'Mumbai', complaints: [{ ticket: '#T-311', domain: 'Kitchen Appliances', issue: 'Air fryer trips home ELCB when reaching 200°C', city: 'Mumbai COCO', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Two-Wheelers (Scooters & Motorcycles)': [
+        { name: 'Virat Kohli', phone: '+91 98888 99000', city: 'Bengaluru', complaints: [{ ticket: '#T-991', domain: 'Two-Wheelers (Scooters & Motorcycles)', issue: 'Throttle response lag on eco mode', city: 'Bengaluru Flagship', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'MS Dhoni', phone: '+91 98999 00111', city: 'Ranchi', complaints: [{ ticket: '#T-405', domain: 'Two-Wheelers (Scooters & Motorcycles)', issue: 'ABS warning light pulsating under hard braking', city: 'Ranchi ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Hardik Pandya', phone: '+91 97000 11223', city: 'Vadodara', complaints: [{ ticket: '#T-312', domain: 'Two-Wheelers (Scooters & Motorcycles)', issue: 'Electric scooter motor controller error 14', city: 'Vadodara Hub', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Three-Wheelers': [
+        { name: 'Abdul Sheikh', phone: '+91 98999 00111', city: 'Pune', complaints: [{ ticket: '#T-441', domain: 'Three-Wheelers', issue: 'Rear axle vibration at 40kmph', city: 'Pune Hub', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Ramesh Yadav', phone: '+91 97000 11223', city: 'Lucknow', complaints: [{ ticket: '#T-209', domain: 'Three-Wheelers', issue: 'E-rickshaw battery meter fluctuating rapidly', city: 'Lucknow ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Suresh Raina', phone: '+91 97111 22334', city: 'Ghaziabad', complaints: [{ ticket: '#T-104', domain: 'Three-Wheelers', issue: 'CNG gas leak detector warning buzzer', city: 'Ghaziabad Hub', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Four-Wheelers (Cars)': [
+        { name: 'Anand Mahindra', phone: '+91 98200 55667', city: 'Mumbai', complaints: [{ ticket: '#T-9012', domain: 'Four-Wheelers (Cars)', issue: 'EV Battery Isolation Fault', city: 'Mumbai Flagship', status: 'In-Progress', date: '17 Oct 2026' }] },
+        { name: 'Gautam Adani', phone: '+91 97111 22334', city: 'Ahmedabad', complaints: [{ ticket: '#T-502', domain: 'Four-Wheelers (Cars)', issue: 'Dual-clutch transmission gear shudder in 2nd gear', city: 'Ahmedabad COCO', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Mukesh Ambani', phone: '+91 97222 33445', city: 'Mumbai', complaints: [{ ticket: '#T-311', domain: 'Four-Wheelers (Cars)', issue: 'ADAS blind spot radar false warning on highway', city: 'Mumbai Flagship', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Inverters & Home Batteries': [
+        { name: 'Nandan Nilekani', phone: '+91 97000 11223', city: 'Bengaluru', complaints: [{ ticket: '#T-551', domain: 'Inverters & Home Batteries', issue: 'Sine wave output distortion under heavy load', city: 'Bengaluru Hub', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Azim Premji', phone: '+91 97111 22334', city: 'Bengaluru', complaints: [{ ticket: '#T-302', domain: 'Inverters & Home Batteries', issue: 'Solar charge controller error code E04', city: 'Bengaluru ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Narayan Murthy', phone: '+91 97222 33445', city: 'Mysuru', complaints: [{ ticket: '#T-201', domain: 'Inverters & Home Batteries', issue: 'Battery deep discharge alert continuous beeping', city: 'Mysuru Hub', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Geysers (Water Heaters)': [
+        { name: 'Smriti Irani', phone: '+91 97111 22334', city: 'Delhi', complaints: [{ ticket: '#T-109', domain: 'Geysers (Water Heaters)', issue: 'Water not heating past lukewarm', city: 'Delhi ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Piyush Goyal', phone: '+91 97222 33445', city: 'Mumbai', complaints: [{ ticket: '#T-204', domain: 'Geysers (Water Heaters)', issue: 'Pressure relief valve leaking water during heating', city: 'Mumbai COCO', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Nirmala Sitharaman', phone: '+91 97333 44556', city: 'Chennai', complaints: [{ ticket: '#T-102', domain: 'Geysers (Water Heaters)', issue: 'Auto-cut indicator light staying red continuously', city: 'Chennai Hub', status: 'Resolved', date: '17 Oct 2026' }] }
+      ],
+      'Other Electronics': [
+        { name: 'Sundar Pichai', phone: '+91 97222 33445', city: 'Chennai', complaints: [{ ticket: '#T-021', domain: 'Other Electronics', issue: 'Custom telemetry transmitter frequency drift', city: 'Chennai Lab', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Satya Nadella', phone: '+91 97333 44556', city: 'Hyderabad', complaints: [{ ticket: '#T-108', domain: 'Other Electronics', issue: 'Smart speaker battery charging port loose', city: 'Hyderabad ASP', status: 'Resolved', date: '17 Oct 2026' }] },
+        { name: 'Shantanu Narayen', phone: '+91 97444 55667', city: 'Hyderabad', complaints: [{ ticket: '#T-205', domain: 'Other Electronics', issue: 'Wireless inkjet printer paper feed motor grinding', city: 'Hyderabad Hub', status: 'Resolved', date: '17 Oct 2026' }] }
+      ]
+    };
+
+    const QUEUE_SAMPLES_BY_DOMAIN = {
+      'Smartphones & Tablets': [
+        { customerName: 'Rajesh Verma', phone: '+91 98201 44321', deviceModel: 'iPhone 15 Pro 256GB', complaint: 'OLED screen flicker & touch latency', status: 'Waiting' },
+        { customerName: 'Sunita Menon', phone: '+91 98112 44556', deviceModel: 'Galaxy S24 Ultra', complaint: 'Battery swelling & charging port loose', status: 'Received' },
+        { customerName: 'Rohan Deshmukh', phone: '+91 97443 88990', deviceModel: 'Pixel 8 Pro', complaint: 'Camera glass cracked & autofocus failure', status: 'Diagnosed' }
+      ],
+      'Laptops & Desktops': [
+        { customerName: 'Aditya Roy', phone: '+91 98111 22334', deviceModel: 'MacBook Pro 16 M3 Max', complaint: 'Kernel panic on startup & battery not charging', status: 'Waiting' },
+        { customerName: 'Shruti Haasan', phone: '+91 98222 33445', deviceModel: 'Dell XPS 15 9530', complaint: 'Thermal throttling and fan blade vibration noise', status: 'Received' },
+        { customerName: 'Varun Dhawan', phone: '+91 98333 44556', deviceModel: 'Lenovo Legion 5 Pro', complaint: 'NVMe SSD controller error in BIOS boot cycle', status: 'Diagnosed' }
+      ],
+      'Smartwatches & Audio Gear': [
+        { customerName: 'Meera Nambiar', phone: '+91 97222 33445', deviceModel: 'Sony WH-1000XM5', complaint: 'Right ear cup hinge broken & audio imbalance', status: 'Waiting' },
+        { customerName: 'Kishan Patel', phone: '+91 97333 44556', deviceModel: 'Galaxy Watch 6 Classic', complaint: 'Heart rate PPG optical sensor glass cracked', status: 'Received' },
+        { customerName: 'Neha Kakkar', phone: '+91 97444 55667', deviceModel: 'Sennheiser Momentum 4', complaint: 'Battery rapid discharge in ANC noise cancelling mode', status: 'Diagnosed' }
+      ],
+      'Air Conditioners (ACs)': [
+        { customerName: 'Sanjay Dutt', phone: '+91 98333 44556', deviceModel: 'Daikin 1.5 Ton Inverter AC', complaint: 'Indoor unit water dripping & cooling failure', status: 'Waiting' },
+        { customerName: 'Kapil Sharma', phone: '+91 98444 55667', deviceModel: 'Hitachi 3 Ton Cassette AC', complaint: 'Expansion valve coil freezing & R32 gas loss', status: 'Received' },
+        { customerName: 'Juhi Chawla', phone: '+91 98555 66778', deviceModel: 'LG Dual Inverter 1.5T', complaint: 'Outdoor PCB controller tripping main circuit breaker', status: 'Diagnosed' }
+      ],
+      'Water Purifiers (RO systems)': [
+        { customerName: 'Pooja Hegde', phone: '+91 98444 55667', deviceModel: 'Kent Grand RO+UV', complaint: 'TDS high warning & low water pressure output', status: 'Waiting' },
+        { customerName: 'Vijay Devarakonda', phone: '+91 98555 66778', deviceModel: 'Pureit Copper+ RO', complaint: 'Solenoid valve failing to cut off water flow', status: 'Received' },
+        { customerName: 'Rani Mukerji', phone: '+91 98666 77889', deviceModel: 'Livpure Zinger RO', complaint: 'SMPS adapter power fluctuating & burning smell', status: 'Diagnosed' }
+      ],
+      'Washing Machines': [
+        { customerName: 'Karan Johar', phone: '+91 98555 66778', deviceModel: 'LG Front Load 8kg', complaint: 'Drum bearings grinding noise during high spin', status: 'Waiting' },
+        { customerName: 'Shilpa Shetty', phone: '+91 98666 77889', deviceModel: 'Samsung Top Load 7.5kg', complaint: 'Drain pump valve clogged & water retention', status: 'Received' },
+        { customerName: 'Manoj Bajpayee', phone: '+91 98777 88990', deviceModel: 'Bosch Series 6 Washing Machine', complaint: 'Door interlock latch error code E01 on display', status: 'Diagnosed' }
+      ],
+      'Refrigerators': [
+        { customerName: 'Deepika Padukone', phone: '+91 98666 77889', deviceModel: 'Samsung Bespoke Double Door', complaint: 'Freezer compartment icing over continuously', status: 'Waiting' },
+        { customerName: 'Ranveer Singh', phone: '+91 98777 88990', deviceModel: 'LG Side-by-Side 688L', complaint: 'Linear inverter compressor clicking and stopping', status: 'Received' },
+        { customerName: 'Anushka Sharma', phone: '+91 98888 99000', deviceModel: 'Whirlpool Protton 3-Door', complaint: 'Fresh food compartment temp rising above 15°C', status: 'Diagnosed' }
+      ],
+      'Kitchen Appliances': [
+        { customerName: 'Chef Sanjeev', phone: '+91 98777 88990', deviceModel: 'Morphy Richards 30L Microwave', complaint: 'Sparking inside cavity when grill is activated', status: 'Waiting' },
+        { customerName: 'Vikas Khanna', phone: '+91 98888 99000', deviceModel: 'Faber Auto-Clean Chimney', complaint: 'Blower motor humming without suction airflow', status: 'Received' },
+        { customerName: 'Farah Khan', phone: '+91 98999 00111', deviceModel: 'Philips Digital Air Fryer', complaint: 'Thermal fuse blown & touch display unresponsive', status: 'Diagnosed' }
+      ],
+      'Two-Wheelers (Scooters & Motorcycles)': [
+        { customerName: 'Virat Kohli', phone: '+91 98888 99000', deviceModel: 'Ather 450X Electric Scooter', complaint: 'Throttle response delay and dashboard display reboot', status: 'Waiting' },
+        { customerName: 'MS Dhoni', phone: '+91 98999 00111', deviceModel: 'TVS Apache RTR 200 4V', complaint: 'ABS sensor warning light flashing in wet conditions', status: 'Received' },
+        { customerName: 'Hardik Pandya', phone: '+91 97000 11223', deviceModel: 'Ola S1 Pro EV', complaint: 'Motor controller error code 14 & regenerative brake lag', status: 'Diagnosed' }
+      ],
+      'Three-Wheelers': [
+        { customerName: 'Abdul Sheikh', phone: '+91 98999 00111', deviceModel: 'Bajaj RE CNG Auto', complaint: 'Clutch slip on uphill inclines and gear shift stiffness', status: 'Waiting' },
+        { customerName: 'Ramesh Yadav', phone: '+91 97000 11223', deviceModel: 'Mahindra Treo EV Auto', complaint: 'Telematics ECU fault and battery percentage drop', status: 'Received' },
+        { customerName: 'Suresh Raina', phone: '+91 97111 22334', deviceModel: 'Piaggio Ape City CNG', complaint: 'Gas pressure regulator leaking near throttle body', status: 'Diagnosed' }
+      ],
+      'Four-Wheelers (Cars)': [
+        { customerName: 'Anand Mahindra', phone: '+91 98200 55667', deviceModel: 'Tata Nexon EV Max', complaint: 'High voltage battery BMS fault error code P0A80', status: 'Waiting' },
+        { customerName: 'Gautam Adani', phone: '+91 97111 22334', deviceModel: 'Hyundai Creta 1.4 Turbo DCT', complaint: 'Dual-clutch transmission shudder when engaging 2nd gear', status: 'Received' },
+        { customerName: 'Mukesh Ambani', phone: '+91 97222 33445', deviceModel: 'Maruti Suzuki Brezza Smart Hybrid', complaint: 'EGR valve clogged & ADAS radar sensor error', status: 'Diagnosed' }
+      ],
+      'Inverters & Home Batteries': [
+        { customerName: 'Nandan Nilekani', phone: '+91 97000 11223', deviceModel: 'Luminous Solar UPS 1500VA', complaint: 'Sine wave output fluctuating under inverter load', status: 'Waiting' },
+        { customerName: 'Azim Premji', phone: '+91 97111 22334', deviceModel: 'Microtek Digital 1550', complaint: 'MPPT charge controller overload relay tripping', status: 'Received' },
+        { customerName: 'Narayan Murthy', phone: '+91 97222 33445', deviceModel: 'Exide 1050VA Pure Sine Wave', complaint: 'Battery cut-off voltage dropping under 10.5V', status: 'Diagnosed' }
+      ],
+      'Geysers (Water Heaters)': [
+        { customerName: 'Smriti Irani', phone: '+91 97111 22334', deviceModel: 'Havells Instanio 15L Water Heater', complaint: 'Heating element tripped MCB instantly', status: 'Waiting' },
+        { customerName: 'Piyush Goyal', phone: '+91 97222 33445', deviceModel: 'AO Smith 25L Storage Geyser', complaint: 'Safety valve leaking continuously under water pressure', status: 'Received' },
+        { customerName: 'Nirmala Sitharaman', phone: '+91 97333 44556', deviceModel: 'Crompton Solarium Qube 15L', complaint: 'Capillary thermostat failing to shut off power', status: 'Diagnosed' }
+      ],
+      'Other Electronics': [
+        { customerName: 'Sundar Pichai', phone: '+91 97222 33445', deviceModel: 'Custom IoT Telemetry Gateway', complaint: 'RF transceiver packet loss & antenna mismatch', status: 'Waiting' },
+        { customerName: 'Satya Nadella', phone: '+91 97333 44556', deviceModel: 'Bose SoundLink Revolve Speaker', complaint: 'USB-C charging port pin damaged & no LED indicator', status: 'Received' },
+        { customerName: 'Shantanu Narayen', phone: '+91 97444 55667', deviceModel: 'Epson L3250 Wi-Fi All-in-One Printer', complaint: 'Printhead nozzles clogged on magenta channel', status: 'Diagnosed' }
+      ]
+    };
+
+    let activeTechnicians = [];
+    let activeCustomerProfiles = [];
+    let sparePartsQueue = [];
+    let cState = {
+      centerType: '',
+      companyName: '',
+      productCategory: '',
+      centerName: '',
+      centerAddress: '',
+      repairQueue: [],
+      actionStack: [],
+      navBackStack: [],
+      currentStep: 1,
+      ticketCounter: 9105
+    };
+
+    const STATUS_FLOW = ['Waiting', 'Received', 'Diagnosed', 'Repaired', 'Delivered'];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      startLiveClock();
+    });
+
+    function startLiveClock() {
+      setInterval(() => {
+        const now = new Date();
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString() + ' IST';
+      }, 1000);
+    }
+
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      if (htmlEl.classList.contains('dark')) {
+        htmlEl.classList.remove('dark');
+        themeIcon.className = 'fa-solid fa-moon text-slate-700 text-sm';
+      } else {
+        htmlEl.classList.add('dark');
+        themeIcon.className = 'fa-solid fa-sun text-amber-500 text-sm';
+      }
+    }
+
+    function toggleCModal() {
+      const modal = document.getElementById('modalCSource');
+      if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function selectCenterType(type) {
+      cState.navBackStack.push(1);
+      cState.centerType = type;
+
+      document.querySelectorAll('.model-card').forEach(c => c.classList.remove('active-mode'));
+
+      cState.currentStep = 2;
+      document.getElementById('step1').classList.add('hidden');
+      document.getElementById('step2').classList.remove('hidden');
+      document.getElementById('btnNavBack').classList.remove('hidden');
+      document.getElementById('btnNavBack').classList.add('flex');
+
+      document.getElementById('stepIcon').innerText = '2';
+      document.getElementById('stepTitle').innerText = 'Product & Company Configuration';
+
+      const compWrapper = document.getElementById('companyInputWrapper');
+      if (type === 'coco' || type === 'asp') {
+        compWrapper.classList.remove('hidden');
+      } else {
+        compWrapper.classList.add('hidden');
+      }
+    }
+
+    function submitStep2() {
+      const compInput = document.getElementById('companyNameInput').value.trim();
+      const catSelect = document.getElementById('productCategorySelect').value;
+
+      if ((cState.centerType === 'coco' || cState.centerType === 'asp') && !compInput) {
+        alert('Please type the Brand / Company Name.');
+        return;
+      }
+      if (!catSelect) {
+        alert('Please select the Product Category to service.');
+        return;
+      }
+
+      cState.companyName = (cState.centerType === 'coco' || cState.centerType === 'asp') ? compInput : 'Multi-Brand / Independent';
+      cState.productCategory = catSelect;
+
+      cState.navBackStack.push(2);
+      cState.currentStep = 3;
+
+      document.getElementById('step2').classList.add('hidden');
+      document.getElementById('step3').classList.remove('hidden');
+
+      document.getElementById('stepIcon').innerText = '3';
+      document.getElementById('stepTitle').innerText = 'Service Center Details';
+    }
+
+    function submitStep3AndLaunch() {
+      const cName = document.getElementById('centerNameInput').value.trim();
+      const cAddr = document.getElementById('centerAddressInput').value.trim();
+
+      if (!cName || !cAddr) {
+        alert('Please enter both Service Centre Name and Address.');
+        return;
+      }
+
+      cState.centerName = cName;
+      cState.centerAddress = cAddr;
+
+      isolateDataByDomain(cState.productCategory);
+
+      document.getElementById('wizardContainer').classList.add('hidden');
+      document.getElementById('mainDashboard').classList.remove('hidden');
+
+      renderDashboardHeader();
+      renderDashboard();
+    }
+
+    function isolateDataByDomain(domain) {
+      activeTechnicians = JSON.parse(JSON.stringify(TECHNICIANS_BY_DOMAIN[domain] || [
+        { id: 901, name: 'Master Tech', rating: 4.8, review: `Specialist in ${domain} repairs.`, activeJobs: 0, repairs: [{ ticket: '#T-01', device: `${domain} Pro`, issue: 'General overhaul', date: '17 Oct 2026' }] }
+      ]));
+
+      activeCustomerProfiles = JSON.parse(JSON.stringify(CUSTOMER_PROFILES_BY_DOMAIN[domain] || [
+        { name: 'Arjun Kapoor', phone: '+91 98200 11223', city: 'Branch', complaints: [{ ticket: '#T-101', domain: domain, issue: 'Diagnostic service', city: 'Local Center', status: 'Resolved', date: '17 Oct 2026' }] }
+      ]));
+
+      cState.repairQueue = [];
+      sparePartsQueue = [];
+      const samples = QUEUE_SAMPLES_BY_DOMAIN[domain] || [
+        { customerName: 'Arjun Kapoor', phone: '+91 98200 11223', deviceModel: `${domain} Standard Model`, complaint: 'Power circuit repair', status: 'Waiting' }
+      ];
+
+      samples.forEach(job => {
+        const ticketId = cState.ticketCounter++;
+        const techId = getLeastLoadedTechnicianId();
+
+        const ticketObj = {
+          ticketId: ticketId,
+          customerName: job.customerName,
+          phone: job.phone,
+          deviceModel: job.deviceModel,
+          complaint: job.complaint,
+          status: job.status,
+          assignedTechId: techId
+        };
+
+        cState.repairQueue.push(ticketObj);
+        syncTechnicianRepairLog(techId, ticketObj);
+
+        if (job.status === 'Diagnosed') {
+          sparePartsQueue.push({
+            requestId: 5000 + ticketId,
+            ticketId: ticketId,
+            partName: `Oem Module for ${job.deviceModel}`,
+            urgencyPriority: 1,
+            partsReceived: 0
+          });
+        }
+      });
+    }
+
+    function getCurrentDateFormatted() {
+      return '17 Oct 2026';
+    }
+
+    function syncTechnicianRepairLog(techId, ticket) {
+      const tech = activeTechnicians.find(t => t.id === techId);
+      if (!tech) return;
+
+      const ticketCode = `#T-${ticket.ticketId}`;
+      const existing = tech.repairs.find(r => r.ticket === ticketCode);
+
+      if (existing) {
+        existing.issue = `[${ticket.status}] ${ticket.complaint}`;
+      } else {
+        tech.repairs.unshift({
+          ticket: ticketCode,
+          device: ticket.deviceModel,
+          issue: `[${ticket.status}] ${ticket.complaint}`,
+          date: getCurrentDateFormatted()
+        });
+      }
+    }
+
+    function removeTechnicianRepairLog(techId, ticketId) {
+      const tech = activeTechnicians.find(t => t.id === techId);
+      if (!tech) return;
+
+      const ticketCode = `#T-${ticketId}`;
+      tech.repairs = tech.repairs.filter(r => r.ticket !== ticketCode);
+    }
+
+    function navigateBackStack() {
+      if (cState.navBackStack.length === 0) return;
+      const prevStep = cState.navBackStack.pop();
+
+      if (prevStep === 1) {
+        cState.currentStep = 1;
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('step1').classList.remove('hidden');
+        document.getElementById('btnNavBack').classList.add('hidden');
+        document.getElementById('stepIcon').innerText = '1';
+        document.getElementById('stepTitle').innerText = 'Select Service Center Type';
+      } else if (prevStep === 2) {
+        cState.currentStep = 2;
+        document.getElementById('step3').classList.add('hidden');
+        document.getElementById('step2').classList.remove('hidden');
+        document.getElementById('stepIcon').innerText = '2';
+        document.getElementById('stepTitle').innerText = 'Product & Company Configuration';
+      }
+    }
+
+    function resetToSetup() {
+      if (confirm('Reconfigure Service Center Setup?')) {
+        document.getElementById('mainDashboard').classList.add('hidden');
+        document.getElementById('wizardContainer').classList.remove('hidden');
+      }
+    }
+
+    function renderDashboardHeader() {
+      const typeLabels = {
+        coco: { label: 'COCO Center', cls: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 border-indigo-500/30' },
+        asp: { label: 'ASP Franchise', cls: 'bg-sky-500/20 text-sky-600 dark:text-sky-300 border-sky-500/30' },
+        multibrand: { label: 'Multi-Brand Third-Party', cls: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-300 border-emerald-500/30' },
+        local: { label: 'Local Repair Hub', cls: 'bg-orange-500/20 text-orange-600 dark:text-orange-300 border-orange-500/30' }
+      };
+
+      const meta = typeLabels[cState.centerType];
+      const badgeEl = document.getElementById('dashTypeBadge');
+      badgeEl.innerText = meta.label;
+      badgeEl.className = `px-2.5 py-0.5 rounded-full text-xs font-mono font-bold tracking-wider uppercase border ${meta.cls}`;
+
+      document.getElementById('dashCompanyBadge').innerText = `Brand: ${cState.companyName}`;
+      document.getElementById('dashCategoryBadge').innerText = `Domain: ${cState.productCategory}`;
+      document.getElementById('dashCenterName').innerText = cState.centerName;
+      document.getElementById('dashCenterAddress').innerHTML = `<i class="fa-solid fa-location-dot text-rose-500"></i> ${cState.centerAddress}`;
+      document.getElementById('queueTitleDomain').innerText = `${cState.productCategory} Repair Queue (C FIFO)`;
+    }
+
+    function getLeastLoadedTechnicianId() {
+      let minJobs = Infinity;
+      let selectedTech = activeTechnicians[0];
+
+      activeTechnicians.forEach(tech => {
+        if (tech.activeJobs < minJobs) {
+          minJobs = tech.activeJobs;
+          selectedTech = tech;
+        }
+      });
+      return selectedTech ? selectedTech.id : 101;
+    }
+
+    function recalculateTechnicianLoads() {
+      activeTechnicians.forEach(t => t.activeJobs = 0);
+
+      cState.repairQueue.forEach(ticket => {
+        if (ticket.status !== 'Repaired' && ticket.status !== 'Delivered' && ticket.assignedTechId) {
+          const tech = activeTechnicians.find(t => t.id === ticket.assignedTechId);
+          if (tech) tech.activeJobs++;
+        }
+      });
+    }
+
+    function renderDashboard() {
+      recalculateTechnicianLoads();
+
+      document.getElementById('statQueueCount').innerText = cState.repairQueue.filter(t => t.status !== 'Delivered').length;
+      
+      const totalLoad = activeTechnicians.reduce((acc, t) => acc + t.activeJobs, 0);
+      document.getElementById('statTechLoad').innerText = `${totalLoad} / ${activeTechnicians.length * 3}`;
+      
+      document.getElementById('statStackCount').innerText = `${cState.actionStack.length} Logged`;
+      document.getElementById('statSparePartsCount').innerText = `${sparePartsQueue.filter(p => p.partsReceived === 0).length} Pending`;
+      document.getElementById('sparePartsQueueMeta').innerText = `Queue: ${sparePartsQueue.length} total requests`;
+
+      const qContainer = document.getElementById('queueListContainer');
+      qContainer.innerHTML = '';
+
+      if (cState.repairQueue.length === 0) {
+        qContainer.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">No pending repair requests in queue for ${cState.productCategory}</div>`;
+      } else {
+        cState.repairQueue.forEach((ticket) => {
+          const card = document.createElement('div');
+          card.className = 'p-4 rounded-xl inner-card space-y-3';
+          card.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">#${ticket.ticketId}</span>
+                <h4 onclick="openCustProfileByName('${ticket.customerName}')" class="font-bold text-slate-900 dark:text-slate-100 text-sm hover:text-indigo-500 cursor-pointer underline decoration-dotted">${ticket.customerName}</h4>
+                <span class="text-xs text-slate-500 dark:text-slate-400 font-mono">(${ticket.phone})</span>
+              </div>
+              <span class="text-[11px] px-2 py-0.5 rounded-full font-semibold ${getStatusBadgeClass(ticket.status)}">${ticket.status}</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+              <div><span class="text-slate-500 font-medium">Model:</span> <span class="text-slate-700 dark:text-slate-300 font-medium">${ticket.deviceModel}</span></div>
+              <div><span class="text-slate-500 font-medium">Issue:</span> <span class="text-slate-700 dark:text-slate-300">${ticket.complaint}</span></div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-200 dark:border-slate-800/80">
+              <div class="flex items-center gap-2 text-xs">
+                <span class="text-slate-500"><i class="fa-solid fa-user-gear text-emerald-500"></i> Assigned:</span>
+                <select onchange="reassignTechnician(${ticket.ticketId}, this.value)" class="input-bg border rounded px-2 py-1 text-xs focus:outline-none">
+                  ${activeTechnicians.map(t => `<option value="${t.id}" ${t.id === ticket.assignedTechId ? 'selected' : ''}>${t.name} (${t.rating}★ \vert{}${t.activeJobs} active)</option>`).join('')}
+                </select>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <span class="text-[11px] text-slate-500 mr-1">Status:</span>
+                ${STATUS_FLOW.map(s => `
+                  <button onclick="advanceStatus(${ticket.ticketId}, '${s}')" class="px-2 py-1 rounded text-[10px] font-semibold transition ${ticket.status === s ? 'bg-indigo-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'}">
+                    ${s}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          `;
+          qContainer.appendChild(card);
+        });
+      }
+
+      // Render Spare Parts Queue Pipeline
+      const spContainer = document.getElementById('sparePartsListContainer');
+      spContainer.innerHTML = '';
+
+      if (sparePartsQueue.length === 0) {
+        spContainer.innerHTML = `<p class="text-slate-500 text-center py-4">No spare parts requisitions in queue. Set tickets to 'Diagnosed' to trigger requests.</p>`;
+      } else {
+        sparePartsQueue.forEach(req => {
+          const ticket = cState.repairQueue.find(t => t.ticketId === req.ticketId);
+          const tech = activeTechnicians.find(t => t.id === (ticket ? ticket.assignedTechId : 101));
+          const row = document.createElement('div');
+          row.className = 'p-2.5 rounded-lg inner-card flex flex-col sm:flex-row sm:items-center justify-between gap-2';
+          row.innerHTML = `
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-2">
+                <span class="font-mono font-bold text-indigo-500">#REQ-${req.requestId}</span>
+                <span class="font-semibold text-slate-800 dark:text-slate-200">${req.partName}</span>
+              </div>
+              <p class="text-[10px] text-slate-500">Requested by <span class="text-emerald-500 font-semibold">${tech ? tech.name : 'Technician'}</span> for Ticket #${req.ticketId}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold ${req.partsReceived === 1 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
+                ${req.partsReceived === 1 ? 'Parts Received' : 'Pending Warehouse'}
+              </span>
+              <button onclick="toggleSparePartReceived(${req.requestId})" class="px-2.5 py-1 rounded bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-semibold transition">
+                ${req.partsReceived === 1 ? 'Mark Pending' : 'Mark Received'}
+              </button>
+            </div>
+          `;
+          spContainer.appendChild(row);
+        });
+      }
+
+      const techListEl = document.getElementById('techniciansList');
+      techListEl.innerHTML = '';
+      activeTechnicians.forEach(tech => {
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-xl inner-card space-y-2 text-xs hover:border-indigo-500 cursor-pointer transition';
+        item.onclick = (e) => {
+          if (!e.target.closest('button')) openTechProfileModal(tech.id);
+        };
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
+                ${tech.name.charAt(0)}
+              </div>
+              <div>
+                <h5 class="font-bold text-slate-900 dark:text-slate-200 flex items-center gap-1">
+                  ${tech.name} <i class="fa-solid fa-circle-info text-[10px] text-indigo-500" title="Click to view past repairs"></i>
+                </h5>
+                <p class="text-[11px] text-amber-500 font-semibold"><i class="fa-solid fa-star text-[10px]"></i> ${tech.rating} Rating</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="font-mono text-xs font-semibold ${tech.activeJobs >= 3 ? 'text-rose-500' : 'text-emerald-500'}">${tech.activeJobs} / 3 Active</span>
+              <p class="text-[10px] text-slate-500">${tech.activeJobs >= 3 ? 'At Capacity' : 'Available'}</p>
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 italic bg-slate-100 dark:bg-slate-950/60 p-2 rounded border border-slate-200 dark:border-slate-800">
+            <i class="fa-solid fa-quote-left text-slate-400 mr-1"></i>"${tech.review}"
+          </p>
+        `;
+        techListEl.appendChild(item);
+      });
+
+      const stackEl = document.getElementById('stackActionList');
+      stackEl.innerHTML = '';
+      if (cState.actionStack.length === 0) {
+        stackEl.innerHTML = `<p class="text-slate-500 text-[11px]">No actions in C Stack buffer.</p>`;
+      } else {
+        [...cState.actionStack].reverse().forEach((act, idx) => {
+          const isTop = idx === 0;
+          const row = document.createElement('div');
+          row.className = `p-2 rounded border text-[11px] ${isTop ? 'bg-amber-500/10 border-amber-500/40 text-amber-800 dark:text-amber-200' : 'bg-slate-100 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'}`;
+          row.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="font-bold">${isTop ? '[STACK TOP] ' : ''}${act.description}</span>
+              <span class="text-[10px] opacity-75">Ticket #${act.ticketId} (${act.date || '17 Oct 2026'})</span>
+            </div>
+          `;
+          stackEl.appendChild(row);
+        });
+      }
+    }
+
+    function getStatusBadgeClass(status) {
+      switch (status) {
+        case 'Waiting': return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30';
+        case 'Received': return 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border border-sky-500/30';
+        case 'Diagnosed': return 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border border-purple-500/30';
+        case 'Repaired': return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30';
+        case 'Delivered': return 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700';
+        default: return 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+      }
+    }
+
+    function toggleSparePartReceived(requestId) {
+      const req = sparePartsQueue.find(r => r.requestId === requestId);
+      if (!req) return;
+      req.partsReceived = req.partsReceived === 1 ? 0 : 1;
+      renderDashboard();
+    }
+
+    function advanceStatus(ticketId, newStatus) {
+      const ticket = cState.repairQueue.find(t => t.ticketId === ticketId);
+      if (!ticket) return;
+      if (ticket.status === newStatus) return;
+
+      // Validation check for Repaired status: Spare parts must be received
+      if (newStatus === 'Repaired') {
+        const req = sparePartsQueue.find(r => r.ticketId === ticketId);
+        if (req && req.partsReceived === 0) {
+          alert(`SPARE PARTS PIPELINE NOTICE:\nCannot mark ticket #${ticketId} as Repaired because requested spare parts ("${req.partName}") have not been received from the warehouse yet! Please mark parts received first.`);
+          return;
+        }
+      }
+
+      if (newStatus === 'Diagnosed') {
+        const existingReq = sparePartsQueue.find(r => r.ticketId === ticketId);
+        if (!existingReq) {
+          sparePartsQueue.unshift({
+            requestId: 5000 + ticketId,
+            ticketId: ticketId,
+            partName: `OEM Replacement Component for ${ticket.deviceModel}`,
+            urgencyPriority: 1,
+            partsReceived: 0
+          });
+        }
+      }
+
+      cState.actionStack.push({
+        actionType: 'STATUS_CHANGE',
+        ticketId: ticketId,
+        prevStatus: ticket.status,
+        newStatus: newStatus,
+        date: getCurrentDateFormatted(),
+        description: `Status: ${ticket.status} ➔ ${newStatus}`
+      });
+
+      ticket.status = newStatus;
+      syncTechnicianRepairLog(ticket.assignedTechId, ticket);
+      renderDashboard();
+
+      // Trigger Postfix (RPN) Invoice Popup when switched to Repaired
+      if (newStatus === 'Repaired') {
+        openInvoiceModal(ticket);
+      }
+    }
+
+    // Postfix (RPN) Expression Evaluator for Dynamic Pricing
+    function evaluateRPNExpression(partsCost, laborCost, discount) {
+      // Postfix expression format: "parts labor + 1.18 * discount -"
+      // Meaning: (parts + labor) * 1.18 (GST) - discount
+      const expressionString = `${partsCost} ${laborCost} + 1.18 * ${discount} -`;
+      const stack = [];
+      const tokens = expressionString.split(' ');
+
+      tokens.forEach(token => {
+        if (!isNaN(token)) {
+          stack.push(parseFloat(token));
+        } else {
+          const b = stack.pop();
+          const a = stack.pop();
+          if (token === '+') stack.push(a + b);
+          else if (token === '-') stack.push(a - b);
+          else if (token === '*') stack.push(a * b);
+          else if (token === '/') stack.push(a / b);
+        }
+      });
+
+      return {
+        expression: expressionString,
+        total: Math.max(0, Math.round(stack[0] || 0))
+      };
+    }
+
+    function openInvoiceModal(ticket) {
+      const partsCost = 1800;
+      const laborCost = 500;
+      const discount = 150;
+      const subtotal = partsCost + laborCost;
+      const tax = Math.round(subtotal * 0.18);
+
+      const rpnResult = evaluateRPNExpression(partsCost, laborCost, discount);
+
+      document.getElementById('invTicketRef').innerText = `#T-${ticket.ticketId}`;
+      document.getElementById('invCustName').innerText = ticket.customerName;
+      document.getElementById('invDeviceModel').innerText = ticket.deviceModel;
+      document.getElementById('invPartsCost').innerText = `₹${partsCost}`;
+      document.getElementById('invLaborCost').innerText = `₹${laborCost}`;
+      document.getElementById('invTaxCost').innerText = `₹${tax}`;
+      document.getElementById('invDiscount').innerText = `-₹${discount}`;
+      document.getElementById('invTotal').innerText = `₹${rpnResult.total}`;
+      document.getElementById('invRPNExpression').innerText = `RPN Formula: [ ${rpnResult.expression} ] ➔ Evaluated Total = ₹${rpnResult.total}`;
+
+      const modal = document.getElementById('modalInvoice');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeInvoiceModal() {
+      const modal = document.getElementById('modalInvoice');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function reassignTechnician(ticketId, newTechId) {
+      newTechId = parseInt(newTechId);
+      const ticket = cState.repairQueue.find(t => t.ticketId === ticketId);
+      if (!ticket) return;
+
+      const oldTechId = ticket.assignedTechId;
+      const targetTech = activeTechnicians.find(t => t.id === newTechId);
+      const oldTech = activeTechnicians.find(t => t.id === oldTechId);
+
+      if (targetTech.activeJobs >= 3 && ticket.assignedTechId !== newTechId) {
+        const autoTechId = getLeastLoadedTechnicianId();
+        const autoTech = activeTechnicians.find(t => t.id === autoTechId);
+        
+        alert(`AUTOMATED LOAD BALANCER NOTICE:\nTechnician ${targetTech.name} is overloaded (${targetTech.activeJobs} active jobs).\nSystem auto-assigned ticket #${ticketId} to available technician: ${autoTech.name}.`);
+
+        removeTechnicianRepairLog(oldTechId, ticketId);
+        ticket.assignedTechId = autoTechId;
+        syncTechnicianRepairLog(autoTechId, ticket);
+
+        cState.actionStack.push({
+          actionType: 'REASSIGN',
+          ticketId: ticketId,
+          prevTechId: oldTechId,
+          newTechId: autoTechId,
+          date: getCurrentDateFormatted(),
+          description: `Auto-balanced from ${oldTech ? oldTech.name : 'Tech'} to ${autoTech.name}`
+        });
+
+        renderDashboard();
+        return;
+      }
+
+      removeTechnicianRepairLog(oldTechId, ticketId);
+      ticket.assignedTechId = newTechId;
+      syncTechnicianRepairLog(newTechId, ticket);
+
+      cState.actionStack.push({
+        actionType: 'REASSIGN',
+        ticketId: ticketId,
+        prevTechId: oldTechId,
+        newTechId: newTechId,
+        date: getCurrentDateFormatted(),
+        description: `Reassigned from ${oldTech ? oldTech.name : 'Tech'} to ${targetTech.name}`
+      });
+
+      renderDashboard();
+    }
+
+    function performUndo() {
+      if (cState.actionStack.length === 0) {
+        alert('Action History Stack is empty. Nothing to undo.');
+        return;
+      }
+
+      const lastAction = cState.actionStack.pop();
+      const ticket = cState.repairQueue.find(t => t.ticketId === lastAction.ticketId);
+
+      if (lastAction.actionType === 'STATUS_CHANGE') {
+        if (ticket) {
+          ticket.status = lastAction.prevStatus;
+          syncTechnicianRepairLog(ticket.assignedTechId, ticket);
+        }
+      } else if (lastAction.actionType === 'REASSIGN') {
+        if (ticket) {
+          removeTechnicianRepairLog(ticket.assignedTechId, ticket.ticketId);
+          ticket.assignedTechId = lastAction.prevTechId;
+          syncTechnicianRepairLog(lastAction.prevTechId, ticket);
+        }
+      } else if (lastAction.actionType === 'NEW_TICKET') {
+        if (ticket) {
+          removeTechnicianRepairLog(ticket.assignedTechId, ticket.ticketId);
+        }
+        cState.repairQueue = cState.repairQueue.filter(t => t.ticketId !== lastAction.ticketId);
+      }
+
+      renderDashboard();
+    }
+
+    function openNewTicketModal() {
+      document.getElementById('modalNewTicket').classList.remove('hidden');
+      document.getElementById('modalNewTicket').classList.add('flex');
+    }
+
+    function closeNewTicketModal() {
+      document.getElementById('modalNewTicket').classList.add('hidden');
+      document.getElementById('modalNewTicket').classList.remove('flex');
+    }
+
+    function submitNewTicket() {
+      const name = document.getElementById('inputCustName').value.trim();
+      const phone = document.getElementById('inputCustPhone').value.trim();
+      const device = document.getElementById('inputDeviceModel').value.trim();
+      const complaint = document.getElementById('inputComplaint').value.trim();
+
+      if (!name || !phone || !device || !complaint) {
+        alert('Please fill in all customer complaint fields.');
+        return;
+      }
+
+      const ticketId = cState.ticketCounter++;
+      const assignedTechId = getLeastLoadedTechnicianId();
+
+      const ticketObj = {
+        ticketId: ticketId,
+        customerName: name,
+        phone: phone,
+        deviceModel: device,
+        complaint: complaint,
+        status: 'Waiting',
+        assignedTechId: assignedTechId
+      };
+
+      cState.repairQueue.push(ticketObj);
+      syncTechnicianRepairLog(assignedTechId, ticketObj);
+
+      cState.actionStack.push({
+        actionType: 'NEW_TICKET',
+        ticketId: ticketId,
+        date: getCurrentDateFormatted(),
+        description: `Enqueued ticket #${ticketId}`
+      });
+
+      let cust = activeCustomerProfiles.find(c => c.name.toLowerCase() === name.toLowerCase());
+      if (!cust) {
+        cust = { name: name, phone: phone, city: cState.centerName, complaints: [] };
+        activeCustomerProfiles.push(cust);
+      }
+      cust.complaints.unshift({
+        ticket: `#T-${ticketId}`,
+        domain: cState.productCategory,
+        issue: complaint,
+        city: cState.centerName,
+        status: 'Waiting',
+        date: getCurrentDateFormatted()
+      });
+
+      document.getElementById('inputCustName').value = '';
+      document.getElementById('inputCustPhone').value = '';
+      document.getElementById('inputDeviceModel').value = '';
+      document.getElementById('inputComplaint').value = '';
+
+      closeNewTicketModal();
+      renderDashboard();
+    }
+
+    function openCRMHistoryModal() {
+      document.getElementById('crmSearchInput').value = '';
+      filterCRMData();
+      document.getElementById('modalCRMHistory').classList.remove('hidden');
+      document.getElementById('modalCRMHistory').classList.add('flex');
+    }
+
+    function closeCRMHistoryModal() {
+      document.getElementById('modalCRMHistory').classList.add('hidden');
+      document.getElementById('modalCRMHistory').classList.remove('flex');
+    }
+
+    function filterCRMData() {
+      const query = document.getElementById('crmSearchInput').value.toLowerCase().trim();
+      const listEl = document.getElementById('crmDataList');
+      listEl.innerHTML = '';
+
+      let matchesCount = 0;
+
+      activeCustomerProfiles.forEach(cust => {
+        cust.complaints.forEach(comp => {
+          const matchText = `${cust.name} ${cust.phone} ${cust.city} ${comp.ticket} ${comp.issue} ${comp.domain}`.toLowerCase();
+          
+          if (!query || matchText.includes(query)) {
+            matchesCount++;
+            const card = document.createElement('div');
+            card.className = 'p-3 rounded-xl inner-card flex items-center justify-between text-xs hover:border-indigo-500 cursor-pointer transition';
+            card.onclick = () => openCustProfileModal(cust);
+            card.innerHTML = `
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-indigo-600 dark:text-cyan-400">${comp.ticket}</span>
+                  <span class="font-bold text-slate-900 dark:text-slate-100">${cust.name}</span>
+                  <span class="text-[10px] text-slate-500 font-mono">(${cust.phone})</span>
+                </div>
+                <p class="text-slate-600 dark:text-slate-300"><span class="font-medium text-slate-400">Issue:</span> ${comp.issue}</p>
+              </div>
+              <div class="text-right space-y-1">
+                <span class="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-mono text-[10px] border border-emerald-500/30">${comp.status}</span>
+                <p class="text-[10px] text-indigo-500 font-semibold">View Profile <i class="fa-solid fa-arrow-right"></i></p>
+              </div>
+            `;
+            listEl.appendChild(card);
+          }
+        });
+      });
+
+      document.getElementById('crmCountBadge').innerText = `Showing ${matchesCount} records isolated to ${cState.productCategory}`;
+
+      if (matchesCount === 0) {
+        listEl.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs">No records found matching "${query}" in ${cState.productCategory} domain</div>`;
+      }
+    }
+
+    function openCustProfileByName(name) {
+      let cust = activeCustomerProfiles.find(c => c.name.toLowerCase() === name.toLowerCase());
+      if (!cust) {
+        cust = { name: name, phone: '+91 98200 00000', city: 'Branch', complaints: [{ ticket: '#T-NEW', domain: cState.productCategory, issue: 'Current active ticket', city: cState.centerName, status: 'Active', date: getCurrentDateFormatted() }] };
+      }
+      openCustProfileModal(cust);
+    }
+
+    function openCustProfileModal(cust) {
+      document.getElementById('custAvatar').innerText = cust.name.charAt(0);
+      document.getElementById('custProfileName').innerText = cust.name;
+      document.getElementById('custProfilePhone').innerText = `${cust.phone} • ${cust.city}`;
+
+      const listEl = document.getElementById('custProfileComplaintsList');
+      listEl.innerHTML = '';
+
+      cust.complaints.forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'p-3 rounded-lg inner-card text-xs space-y-1';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-mono font-bold text-indigo-500">${c.ticket}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded ${getStatusBadgeClass(c.status)}">${c.status}</span>
+          </div>
+          <p class="font-semibold text-slate-800 dark:text-slate-200">${c.issue}</p>
+          <div class="flex items-center justify-between text-[10px] text-slate-500">
+            <span>Domain: ${c.domain}</span>
+            <span>${c.city} (${c.date})</span>
+          </div>
+        `;
+        listEl.appendChild(item);
+      });
+
+      document.getElementById('modalCustProfile').classList.remove('hidden');
+      document.getElementById('modalCustProfile').classList.add('flex');
+    }
+
+    function closeCustProfileModal() {
+      document.getElementById('modalCustProfile').classList.add('hidden');
+      document.getElementById('modalCustProfile').classList.remove('flex');
+    }
+
+    function openTechProfileModal(techId) {
+      const tech = activeTechnicians.find(t => t.id === techId);
+      if (!tech) return;
+
+      document.getElementById('techAvatar').innerText = tech.name.charAt(0);
+      document.getElementById('techProfileName').innerText = tech.name;
+      document.getElementById('techProfileMeta').innerHTML = `<i class="fa-solid fa-star"></i> ${tech.rating} Rating • ${tech.activeJobs} Active Jobs`;
+      document.getElementById('techProfileReview').innerText = `"${tech.review}"`;
+
+      const listEl = document.getElementById('techProfileRepairsList');
+      listEl.innerHTML = '';
+
+      if (tech.repairs.length === 0) {
+        listEl.innerHTML = `<p class="text-xs text-slate-500 py-4 text-center">No assigned repairs in profile log.</p>`;
+      } else {
+        tech.repairs.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'p-2.5 rounded-lg inner-card text-xs space-y-1';
+          card.innerHTML = `
+            <div class="flex items-center justify-between">
+              <span class="font-mono font-bold text-emerald-500">${r.ticket}</span>
+              <span class="text-[10px] text-slate-500">${r.date}</span>
+            </div>
+            <p class="font-semibold text-slate-800 dark:text-slate-200">${r.device} - ${r.issue}</p>
+          `;
+          listEl.appendChild(card);
+        });
+      }
+
+      document.getElementById('modalTechProfile').classList.remove('hidden');
+      document.getElementById('modalTechProfile').classList.add('flex');
+    }
+
+    function closeTechProfileModal() {
+      document.getElementById('modalTechProfile').classList.add('hidden');
+      document.getElementById('modalTechProfile').classList.remove('flex');
+    }
+  </script>
+</body>
+</html>

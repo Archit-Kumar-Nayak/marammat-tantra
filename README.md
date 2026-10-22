@@ -25,6 +25,7 @@ The system utilizes a unique hybrid architecture:
 
 ---
 
+
 ## 📊 System Architecture & Operation Modes
 - **COCO:** Company-Owned, Company-Operated Flagship Centers.
 - **ASP:** Authorized Service Provider Franchises.
